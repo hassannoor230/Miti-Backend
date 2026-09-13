@@ -1,0 +1,17 @@
+{
+  "buildCommand": "npm install --production",
+  "outputDirectory": ".",
+  "installVersion": "3",
+  "framework": "nodejs",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "runtime": "nodejs22.x"
+    }
+  }
+}

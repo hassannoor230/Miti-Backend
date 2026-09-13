@@ -1,5 +1,6 @@
 const { isMongoReady } = require('../config/db');
 const { asyncHandler } = require('../middleware/errorHandler');
+const { makeFilename } = require('../middleware/upload');
 const jsondb = require('../utils/jsondb');
 const Service = require('../models/Service');
 
@@ -46,7 +47,7 @@ const create = asyncHandler(async (req, res) => {
   if (!body.name || !body.slug) {
     return res.status(422).json({ success: false, message: 'Service name is required.' });
   }
-  if (req.file) body.image = `/uploads/${req.file.filename}`;
+  if (req.file) body.image = `/uploads/${makeFilename(req.file)}`;
   if (isMongoReady()) {
     const exists = await Service.findOne({ slug: body.slug });
     if (exists) return res.status(409).json({ success: false, message: 'A service with this slug already exists.' });
@@ -62,7 +63,7 @@ const create = asyncHandler(async (req, res) => {
 const update = asyncHandler(async (req, res) => {
   const body = { ...req.body };
   if (body.slug) body.slug = slugify(body.slug);
-  if (req.file) body.image = `/uploads/${req.file.filename}`;
+  if (req.file) body.image = `/uploads/${makeFilename(req.file)}`;
   if (isMongoReady()) {
     const updated = await Service.findByIdAndUpdate(req.params.id, body, { new: true, runValidators: true });
     if (!updated) return res.status(404).json({ success: false, message: 'Service not found.' });

@@ -1,5 +1,6 @@
 const { isMongoReady } = require('../config/db');
 const { asyncHandler } = require('../middleware/errorHandler');
+const { makeFilename } = require('../middleware/upload');
 const jsondb = require('../utils/jsondb');
 const Gallery = require('../models/Gallery');
 
@@ -21,7 +22,7 @@ const list = asyncHandler(async (req, res) => {
 
 const create = asyncHandler(async (req, res) => {
   const body = { ...req.body };
-  if (req.file) body.image = `/uploads/${req.file.filename}`;
+  if (req.file) body.image = `/uploads/${makeFilename(req.file)}`;
   if (!body.image) return res.status(422).json({ success: false, message: 'An image is required.' });
   if (typeof body.featured === 'string') body.featured = body.featured === 'true';
   if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder) || 0;
@@ -35,7 +36,7 @@ const create = asyncHandler(async (req, res) => {
 
 const update = asyncHandler(async (req, res) => {
   const body = { ...req.body };
-  if (req.file) body.image = `/uploads/${req.file.filename}`;
+  if (req.file) body.image = `/uploads/${makeFilename(req.file)}`;
   if (typeof body.featured === 'string') body.featured = body.featured === 'true';
   if (isMongoReady()) {
     const updated = await Gallery.findByIdAndUpdate(req.params.id, body, { new: true, runValidators: true });

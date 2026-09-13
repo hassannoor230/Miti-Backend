@@ -57,8 +57,24 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(generalLimiter);
 
-// Uploaded images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const fs = require('fs');
+
+// Uploaded images — only mount the static folder when it actually exists.
+// In serverless environments the uploads dir is never written to disk
+// (uploads are buffered in memory), so this middleware is a no-op there.
+const uploadsDir = path.join(__dirname, 'uploads');
+if (fs.existsSync(uploadsDir)) {
+  app.use('/uploads', express.static(uploadsDir));
+}
+
+// Root health-check — responds to GET / so the domain root is not a 404.
+app.get('/', (req, res) =>
+  res.status(200).json({ status: 'ok', message: 'Miti Beauty API active', service: 'miti-beauty-api' })
+);
+
+// Favicon — answer HEAD/GET for /favicon.ico to avoid noisy 404 logs.
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.head('/favicon.ico', (req, res) => res.status(204).end());
 
 // Health
 app.get('/api/health', (req, res) => res.json({ success: true, service: 'miti-beauty-api', time: new Date().toISOString() }));
