@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm install --production",
   "outputDirectory": ".",
-  "installVersion": "3",
   "framework": "nodejs",
   "rewrites": [
     {

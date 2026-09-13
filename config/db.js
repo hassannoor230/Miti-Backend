@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 let mongoReady = false;
 let lastError = null;
 
+// On Vercel serverless functions, fail fast so the JSON fallback kicks in
+// quickly (8 s is too long for a cold-start timeout).
+const isServerless = Boolean(process.env.VERCEL);
+const DEFAULT_TIMEOUT = isServerless ? 3000 : 8000;
+
 function isMongoReady() {
   return mongoReady && mongoose.connection.readyState === 1;
 }
@@ -43,13 +48,13 @@ async function connectDB() {
 
   try {
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: Number(process.env.MONGO_TIMEOUT_MS) || 8000,
+      serverSelectionTimeoutMS: Number(process.env.MONGO_TIMEOUT_MS) || DEFAULT_TIMEOUT,
       socketTimeoutMS: 360000,
       maxPoolSize: 10,
       minPoolSize: 1,
       maxIdleTimeMS: 30000,
-      // Fail fast in serverless so the JSON fallback kicks in immediately.
-      connectTimeoutMS: 8000,
+      connectTimeoutMS: DEFAULT_TIMEOUT,
+      bufferCommands: false,
     });
     mongoReady = true;
     lastError = null;

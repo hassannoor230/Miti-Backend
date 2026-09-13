@@ -56,7 +56,7 @@
     "aboutDescription": "Miti Beauty is a welcoming beauty salon based on Gloucester Road in Horfield, Bristol, offering professional beauty treatments with a focus on quality, care and attention to detail.",
     "bookingCTA": "Book an Appointment",
     "whatsappDefaultMessage": "Hi Miti Beauty, I'd like to enquire about booking an appointment.",
-    "updatedAt": "2026-09-13T13:58:24.542Z"
+    "updatedAt": "2026-09-13T18:20:57.994Z"
   },
   "services": [
     {
@@ -72,8 +72,8 @@
       "active": true,
       "sortOrder": 1,
       "_id": "service_seed_1",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "name": "Eyelash Extensions",
@@ -88,8 +88,8 @@
       "active": true,
       "sortOrder": 2,
       "_id": "service_seed_2",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "name": "Nail Extensions",
@@ -104,8 +104,8 @@
       "active": true,
       "sortOrder": 3,
       "_id": "service_seed_3",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "name": "Manicure",
@@ -120,8 +120,8 @@
       "active": true,
       "sortOrder": 4,
       "_id": "service_seed_4",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "name": "Threading",
@@ -136,8 +136,8 @@
       "active": true,
       "sortOrder": 5,
       "_id": "service_seed_5",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     }
   ],
   "reviews": [
@@ -151,8 +151,8 @@
       "featured": true,
       "approved": true,
       "_id": "review_seed_1",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "customerName": "roghaye habibi",
@@ -164,8 +164,8 @@
       "featured": true,
       "approved": true,
       "_id": "review_seed_2",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     },
     {
       "customerName": "Lara Gemei",
@@ -177,22 +177,12 @@
       "featured": true,
       "approved": true,
       "_id": "review_seed_3",
-      "createdAt": "2026-09-13T13:58:24.542Z",
-      "updatedAt": "2026-09-13T13:58:24.542Z"
+      "createdAt": "2026-09-13T18:20:57.994Z",
+      "updatedAt": "2026-09-13T18:20:57.994Z"
     }
   ],
   "gallery": [],
   "bookings": [],
   "messages": [],
-  "admins": [
-    {
-      "_id": "admins_mtzvq7hlaf743818baec",
-      "createdAt": "2026-09-13T13:58:24.873Z",
-      "updatedAt": "2026-09-13T13:58:24.873Z",
-      "name": "Salon Owner",
-      "email": "admin@mitibeauty.co.uk",
-      "passwordHash": "$2a$12$Ck8JmhkpL1K4oLOajaGxtOMYdbyB7C5FnY0ALuVkIfNYoXGHwCN02",
-      "role": "admin"
-    }
-  ]
+  "admins": []
 }

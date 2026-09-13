@@ -1,40 +1,116 @@
 /**
- * Tiny file-based JSON store used when MONGODB_URI is not configured
- * (local preview / development). Mirrors the Mongoose collections so the
- * whole API works identically with or without MongoDB.
+ * Tiny JSON store used when MONGODB_URI is not configured or MongoDB is
+ * unreachable (local preview / development / serverless fallback).
+ * Mirrors the Mongoose collections so the whole API works identically
+ * with or without MongoDB.
+ *
+ * WRITABLE-FILESYSTEM DETECTION
+ *   Vercel's /var/task directory is read-only, but /tmp/ is writable.
+ *   On local dev the source data/ dir is writable.  We probe at module
+ *   load to pick the right location.  If nothing is writable (rare), we
+ *   fall back to a pure in-memory store so the API never crashes with EROFS.
  */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_FILE = path.join(DATA_DIR, 'db.json');
+const SOURCE_DATA_DIR = path.join(__dirname, '..', 'data');
+const SOURCE_DB_FILE = path.join(SOURCE_DATA_DIR, 'db.json');
+
+function getSeedData() {
+  const seedData = require('./seed-data');
+  return typeof seedData.getInitialDb === 'function' ? seedData.getInitialDb() : seedData;
+}
+
+// In-memory snapshot — used when no writable filesystem location is found.
+let memoryDb = null;
+
+function probeWritable(dir) {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    const probe = path.join(dir, '.probe');
+    fs.writeFileSync(probe, 'ok');
+    fs.unlinkSync(probe);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Choose a writable data directory.
+//   1. Source data/ dir  — local dev
+//   2. /tmp/             — Vercel serverless (persists across warm invocations)
+//   3. in-memory         — last resort, never crashes
+let DATA_DIR = SOURCE_DATA_DIR;
+let DB_FILE = SOURCE_DB_FILE;
+let readOnlyFs = !probeWritable(SOURCE_DATA_DIR);
+
+if (readOnlyFs && probeWritable('/tmp')) {
+  DATA_DIR = path.join('/tmp', 'miti-data');
+  DB_FILE = path.join(DATA_DIR, 'db.json');
+  readOnlyFs = !probeWritable(DATA_DIR);
+}
+
+if (readOnlyFs) {
+  // No writable location — pure in-memory store.
+  memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+}
 
 function ensureSeeded() {
+  if (readOnlyFs) {
+    if (memoryDb === null) {
+      memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+    }
+    return;
+  }
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_FILE)) {
-    const seedData = require('./seed-data');
-    const initial = typeof seedData.getInitialDb === 'function' ? seedData.getInitialDb() : seedData;
+    // On Vercel, try to copy the pre-bundled db.json so seeded data
+    // (services, reviews, settings) is available immediately.
+    if (process.env.VERCEL && fs.existsSync(SOURCE_DB_FILE)) {
+      try {
+        fs.writeFileSync(DB_FILE, fs.readFileSync(SOURCE_DB_FILE, 'utf8'));
+        return;
+      } catch (e) {
+        /* fall through to seeding from seed-data */
+      }
+    }
+    const initial = getSeedData();
     fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2));
   }
 }
 
 function readDb() {
+  if (readOnlyFs) {
+    if (memoryDb === null) {
+      memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+    }
+    return JSON.parse(JSON.stringify(memoryDb));
+  }
   ensureSeeded();
   try {
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
   } catch (e) {
-    const seedData = require('./seed-data');
-    const initial = typeof seedData.getInitialDb === 'function' ? seedData.getInitialDb() : seedData;
-    return JSON.parse(JSON.stringify(initial));
+    if (memoryDb !== null) return JSON.parse(JSON.stringify(memoryDb));
+    return JSON.parse(JSON.stringify(getSeedData()));
   }
 }
 
 function writeDb(db) {
+  if (readOnlyFs) {
+    memoryDb = JSON.parse(JSON.stringify(db));
+    return;
+  }
   ensureSeeded();
   const tmp = DB_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
-  fs.renameSync(tmp, DB_FILE);
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.renameSync(tmp, DB_FILE);
+  } catch (e) {
+    // Filesystem became read-only at runtime — switch to in-memory.
+    readOnlyFs = true;
+    memoryDb = JSON.parse(JSON.stringify(db));
+  }
 }
 
 function uid(prefix = 'id') {
@@ -95,7 +171,12 @@ function getSettings() {
 }
 
 function resetDb() {
-  if (fs.existsSync(DB_FILE)) fs.unlinkSync(DB_FILE);
+  memoryDb = null;
+  if (!readOnlyFs && fs.existsSync(DB_FILE)) {
+    try {
+      fs.unlinkSync(DB_FILE);
+    } catch (e) { /* ignore */ }
+  }
   ensureSeeded();
   return readDb();
 }
