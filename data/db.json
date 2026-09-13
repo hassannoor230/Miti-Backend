@@ -193,6 +193,15 @@
       "service": "Lash Lift",
       "status": "pending",
       "read": false
+    },
+    {
+      "_id": "bookings_mu06jz3re5ffd46b91a3",
+      "createdAt": "2026-09-13T19:01:29.839Z",
+      "updatedAt": "2026-09-13T19:01:29.839Z",
+      "name": "Jane",
+      "phone": "1234567890",
+      "service": "Lash Lift",
+      "status": "pending"
     }
   ],
   "messages": [],
