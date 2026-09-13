@@ -31,4 +31,24 @@ const update = asyncHandler(async (req, res) => {
   res.json({ success: true, data: doc });
 });
 
-module.exports = { get, update };
+/** SMTP status — admin only. Never returns secrets, only booleans. */
+const smtpStatus = asyncHandler(async (req, res) => {
+  const configured = Boolean(
+    (process.env.SMTP_HOST || '').trim() &&
+    (process.env.SMTP_USER || '').trim() &&
+    (process.env.SMTP_PASS || '').trim()
+  );
+  res.json({
+    success: true,
+    data: {
+      configured,
+      host: process.env.SMTP_HOST || '',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: String(process.env.SMTP_SECURE || '').toLowerCase() === 'true' || Number(process.env.SMTP_PORT) === 465,
+      from: process.env.SMTP_FROM || process.env.SMTP_USER || '',
+      ownerEmail: process.env.OWNER_EMAIL || '',
+    },
+  });
+});
+
+module.exports = { get, update, smtpStatus };

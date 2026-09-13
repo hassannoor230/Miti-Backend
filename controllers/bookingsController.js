@@ -1,5 +1,6 @@
 const { isMongoReady } = require('../config/db');
 const { asyncHandler } = require('../middleware/errorHandler');
+const { sendMail } = require('../utils/email');
 const jsondb = require('../utils/jsondb');
 const Booking = require('../models/Booking');
 
@@ -55,13 +56,76 @@ const create = asyncHandler(async (req, res) => {
     status: 'pending',
     read: false,
   };
+
+  let created;
   if (isMongoReady()) {
-    const created = await Booking.create(payload);
-    return res.status(201).json({ success: true, data: created, message: 'Appointment request received.' });
+    created = await Booking.create(payload);
+  } else {
+    created = jsondb.insert('bookings', payload);
   }
-  const created = jsondb.insert('bookings', payload);
+
+  // Fire-and-forget email notifications (never block the response).
+  notifyBooking(created).catch(() => {});
+
   res.status(201).json({ success: true, data: created, message: 'Appointment request received.' });
 });
+
+async function getSettings() {
+  if (isMongoReady()) {
+    const BusinessSettings = require('../models/BusinessSettings');
+    return (await BusinessSettings.findOne().lean()) || {};
+  }
+  const jsondb = require('../utils/jsondb');
+  return jsondb.getSettings() || {};
+}
+
+async function notifyBooking(booking) {
+  const s = await getSettings();
+  const salonName = s.businessName || 'Miti Beauty';
+  const dateStr = booking.preferredDate || 'your preferred date';
+  const timeStr = booking.preferredTime || 'your preferred time';
+
+  // 1) Confirmation to the customer
+  if (booking.email) {
+    await sendMail({
+      to: booking.email,
+      subject: `Appointment request received — ${salonName}`,
+      html: `
+        <p>Hi <strong>${booking.name}</strong>,</p>
+        <p>Thank you for your appointment request at <strong>${salonName}</strong>. We have received it and will confirm shortly.</p>
+        <p><strong>Service:</strong> ${booking.service || '—'}<br>
+        <strong>Date:</strong> ${dateStr}<br>
+        <strong>Time:</strong> ${timeStr}</p>
+        <p>If you need to change anything, just reply to this email or call us on ${s.phone || 'our published number'}.</p>
+        <p>Warmly,<br>${salonName} team</p>
+      `,
+      text: `Hi ${booking.name},\n\nThank you for your appointment request at ${salonName}. We have received it and will confirm shortly.\n\nService: ${booking.service || '—'}\nDate: ${dateStr}\nTime: ${timeStr}\n\nIf you need to change anything, just reply to this email or call us on ${s.phone || 'our published number'}.\n\nWarmly,\n${salonName} team`,
+    });
+  }
+
+  // 2) Notification to the salon owner
+  const ownerEmail = process.env.OWNER_EMAIL || s.email;
+  if (ownerEmail) {
+    await sendMail({
+      to: ownerEmail,
+      subject: `New appointment request — ${booking.name}`,
+      html: `
+        <p>New appointment request received at <strong>${salonName}</strong>:</p>
+        <ul>
+          <li><strong>Name:</strong> ${booking.name}</li>
+          <li><strong>Phone:</strong> ${booking.phone}</li>
+          <li><strong>Email:</strong> ${booking.email || '—'}</li>
+          <li><strong>Service:</strong> ${booking.service || '—'}</li>
+          <li><strong>Date:</strong> ${dateStr}</li>
+          <li><strong>Time:</strong> ${timeStr}</li>
+        </ul>
+        ${booking.message ? `<p><strong>Message:</strong> ${booking.message}</p>` : ''}
+        <p>View in admin: ${process.env.CLIENT_URL || ''}/admin/bookings</p>
+      `,
+      text: `New appointment request at ${salonName}:\n\nName: ${booking.name}\nPhone: ${booking.phone}\nEmail: ${booking.email || '—'}\nService: ${booking.service || '—'}\nDate: ${dateStr}\nTime: ${timeStr}\n\n${booking.message ? 'Message: ' + booking.message : ''}`,
+    });
+  }
+}
 
 const update = asyncHandler(async (req, res) => {
   const allowed = {};
