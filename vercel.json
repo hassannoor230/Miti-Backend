@@ -6,11 +6,11 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index.js"
+      "destination": "/server.js"
     }
   ],
   "functions": {
-    "api/index.js": {
+    "server.js": {
       "runtime": "nodejs22.x"
     }
   }

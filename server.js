@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
@@ -57,8 +58,6 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(generalLimiter);
 
-const fs = require('fs');
-
 // Uploaded images — only mount the static folder when it actually exists.
 // In serverless environments the uploads dir is never written to disk
 // (uploads are buffered in memory), so this middleware is a no-op there.
@@ -110,11 +109,21 @@ async function start() {
   } catch (e) {
     console.warn('[auth] Admin bootstrap skipped:', e.message);
   }
+}
+
+// Trigger DB connect + admin bootstrap as soon as this module loads, so it
+// runs both in standalone mode and when imported by the Vercel serverless
+// runtime (where app.listen is never called).
+start().catch((e) => console.error('[api] startup error:', e));
+
+// Standalone mode: `node server.js` / `npm run dev` / `npm start`.
+if (require.main === module) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`[api] Miti Beauty API listening on port ${PORT}`);
   });
 }
 
-start();
-
+// Vercel serverless mode: the platform imports this file and treats the
+// default export as the request handler. Express `app` is itself a
+// `(req, res) => void` function, so this works out of the box.
 module.exports = app;
