@@ -182,7 +182,19 @@
     }
   ],
   "gallery": [],
-  "bookings": [],
+  "bookings": [
+    {
+      "_id": "bookings_mu0618zad415ee436200",
+      "createdAt": "2026-09-13T18:46:56.181Z",
+      "updatedAt": "2026-09-13T18:46:56.181Z",
+      "name": "Jane Doe",
+      "phone": "07400123456",
+      "email": "jane@example.com",
+      "service": "Lash Lift",
+      "status": "pending",
+      "read": false
+    }
+  ],
   "messages": [],
   "admins": [
     {

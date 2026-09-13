@@ -22,7 +22,27 @@ function getSeedData() {
   return typeof seedData.getInitialDb === 'function' ? seedData.getInitialDb() : seedData;
 }
 
-// In-memory snapshot — used when no writable filesystem location is found.
+function ensureAdminInDb(db) {
+  if (!db.admins || db.admins.length === 0) {
+    const bcrypt = require('bcryptjs');
+    const email = (process.env.ADMIN_EMAIL || 'admin@mitibeauty.co.uk').toLowerCase();
+    const passwordHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'MitiAdmin2026!', 12);
+    const now = new Date().toISOString();
+    db.admins = [
+      {
+        _id: uid('admins'),
+        name: 'Salon Owner',
+        email,
+        passwordHash,
+        role: 'admin',
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+  }
+  return db;
+}
+
 let memoryDb = null;
 
 function probeWritable(dir) {
@@ -53,13 +73,13 @@ if (readOnlyFs && probeWritable('/tmp')) {
 
 if (readOnlyFs) {
   // No writable location — pure in-memory store.
-  memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+  memoryDb = ensureAdminInDb(JSON.parse(JSON.stringify(getSeedData())));
 }
 
 function ensureSeeded() {
   if (readOnlyFs) {
     if (memoryDb === null) {
-      memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+      memoryDb = ensureAdminInDb(JSON.parse(JSON.stringify(getSeedData())));
     }
     return;
   }
@@ -75,7 +95,7 @@ function ensureSeeded() {
         /* fall through to seeding from seed-data */
       }
     }
-    const initial = getSeedData();
+    const initial = ensureAdminInDb(getSeedData());
     fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2));
   }
 }
@@ -83,7 +103,7 @@ function ensureSeeded() {
 function readDb() {
   if (readOnlyFs) {
     if (memoryDb === null) {
-      memoryDb = JSON.parse(JSON.stringify(getSeedData()));
+      memoryDb = ensureAdminInDb(JSON.parse(JSON.stringify(getSeedData())));
     }
     return JSON.parse(JSON.stringify(memoryDb));
   }
@@ -92,7 +112,7 @@ function readDb() {
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
   } catch (e) {
     if (memoryDb !== null) return JSON.parse(JSON.stringify(memoryDb));
-    return JSON.parse(JSON.stringify(getSeedData()));
+    return JSON.parse(JSON.stringify(ensureAdminInDb(getSeedData())));
   }
 }
 
