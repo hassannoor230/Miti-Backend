@@ -184,5 +184,15 @@
   "gallery": [],
   "bookings": [],
   "messages": [],
-  "admins": []
+  "admins": [
+    {
+      "_id": "admins_mu05ljh59d4a6334db1b",
+      "createdAt": "2026-09-13T18:34:43.268Z",
+      "updatedAt": "2026-09-13T18:34:43.268Z",
+      "name": "Salon Owner",
+      "email": "admin@mitibeauty.co.uk",
+      "passwordHash": "$2a$12$/kPeEJ/S88b.dLZPEiqDqepoV6herZXudt.N9bhCd78xlJ2zwY0EW",
+      "role": "admin"
+    }
+  ]
 }
