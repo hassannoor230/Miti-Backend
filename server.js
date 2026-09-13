@@ -107,18 +107,29 @@ app.use(errorHandler);
 
 async function start() {
   await connectDB();
-  // Ensure a default admin exists (JSON-store mode) so /admin works out of the box.
+  // Ensure a default admin exists so /admin works out of the box.
   try {
     const { isMongoReady } = require('./config/db');
-    if (!isMongoReady()) {
-      const bcrypt = require('bcryptjs');
-      const jsondb = require('./utils/jsondb');
-      const email = (process.env.ADMIN_EMAIL || 'admin@mitibeauty.co.uk').toLowerCase();
-      const existing = jsondb.findOne('admins', (a) => String(a.email).toLowerCase() === email);
+    const bcrypt = require('bcryptjs');
+    const email = (process.env.ADMIN_EMAIL || 'admin@mitibeauty.co.uk').toLowerCase();
+
+    if (isMongoReady()) {
+      const Admin = require('./models/Admin');
+      const existing = await Admin.findOne({ email });
       if (!existing) {
         const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'MitiAdmin2026!', 12);
-        jsondb.insert('admins', { name: 'Salon Owner', email, passwordHash, role: 'admin' });
-        console.log(`[auth] Default admin created: ${email}`);
+        await Admin.create({ name: 'Salon Owner', email, passwordHash, role: 'admin' });
+        console.log(`[auth] Default admin created (MongoDB): ${email}`);
+      } else {
+        console.log(`[auth] Admin exists (MongoDB): ${email}`);
+      }
+    } else {
+      // JSON-store admin is created synchronously by utils/jsondb.js's
+      // ensureSeeded(), so we only log here for visibility.
+      const jsondb = require('./utils/jsondb');
+      const existing = jsondb.findOne('admins', (a) => String(a.email).toLowerCase() === email);
+      if (existing) {
+        console.log(`[auth] Admin exists (JSON): ${email}`);
       }
     }
   } catch (e) {
