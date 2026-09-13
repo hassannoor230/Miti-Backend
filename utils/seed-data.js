@@ -1,0 +1,178 @@
+/**
+ * VERIFIED seed data for Miti Beauty.
+ * Only real business information is used here — nothing is fabricated.
+ * Prices, hours, qualifications etc. are intentionally left blank so the
+ * frontend renders "Available on enquiry" until the owner adds them.
+ */
+
+const WHATSAPP_NUMBER = '447478558408';
+
+const settings = {
+  businessName: 'Miti Beauty',
+  category: 'Beauty Salon',
+  phone: '+44 7478 558408',
+  phoneIntl: '+447478558408',
+  whatsapp: WHATSAPP_NUMBER,
+  email: '',
+  addressStreet: '427 Gloucester Rd',
+  addressArea: 'Horfield',
+  addressCity: 'Bristol',
+  postcode: 'BS7 8TZ',
+  country: 'United Kingdom',
+  fullAddress: '427 Gloucester Rd, Horfield, Bristol BS7 8TZ, United Kingdom',
+  plusCode: 'FCM7+VG Bristol, United Kingdom',
+  instagram: 'mitibeautyuk',
+  instagramUrl: 'https://instagram.com/mitibeautyuk',
+  googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Miti+Beauty+427+Gloucester+Rd+Horfield+Bristol+BS7+8TZ',
+  googleRating: 4.9,
+  googleReviewCount: 61,
+  statusNote: 'Closed · Opens 9:30 AM Monday',
+  ownerMessage: 'Please get in touch with me by phone call or via WhatsApp message...',
+  openingHours: [
+    { day: 'Monday', hours: 'Available on enquiry' },
+    { day: 'Tuesday', hours: 'Available on enquiry' },
+    { day: 'Wednesday', hours: 'Available on enquiry' },
+    { day: 'Thursday', hours: 'Available on enquiry' },
+    { day: 'Friday', hours: 'Available on enquiry' },
+    { day: 'Saturday', hours: 'Available on enquiry' },
+    { day: 'Sunday', hours: 'Available on enquiry' },
+  ],
+  heroTitle: 'Beauty, Confidence & Care',
+  heroDescription:
+    'Professional beauty treatments in Horfield, Bristol, delivered with care, attention to detail and a personal touch.',
+  aboutTitle: 'Beauty With a Personal Touch',
+  aboutDescription:
+    'Miti Beauty is a welcoming beauty salon based on Gloucester Road in Horfield, Bristol, offering professional beauty treatments with a focus on quality, care and attention to detail.',
+  bookingCTA: 'Book an Appointment',
+  whatsappDefaultMessage: "Hi Miti Beauty, I'd like to enquire about booking an appointment.",
+};
+
+const services = [
+  {
+    name: 'Lash Services',
+    slug: 'lashes',
+    description: 'Professional lash treatments designed around your preferred look and natural lashes.',
+    longDescription:
+      'Professional lash treatments designed around your preferred look and natural lashes. Every treatment is carried out with care and attention to detail in a welcoming salon environment.',
+    price: '',
+    duration: '',
+    image: '',
+    category: 'Lashes',
+    featured: true,
+    active: true,
+    sortOrder: 1,
+  },
+  {
+    name: 'Eyelash Extensions',
+    slug: 'eyelash-extensions',
+    description: 'Beautiful eyelash extension treatments with attention to detail and a personalized finish.',
+    longDescription:
+      'Beautiful eyelash extension treatments with attention to detail and a personalized finish. Your lashes are styled to suit you, for a beautiful, natural-looking result.',
+    price: '',
+    duration: '',
+    image: '',
+    category: 'Eyelash Extensions',
+    featured: true,
+    active: true,
+    sortOrder: 2,
+  },
+  {
+    name: 'Nail Extensions',
+    slug: 'nail-extensions',
+    description: 'Professional nail extension services designed to create beautiful, polished results.',
+    longDescription:
+      'Professional nail extension services designed to create beautiful, polished results. Sit back in a warm, welcoming salon while your nails are transformed.',
+    price: '',
+    duration: '',
+    image: '',
+    category: 'Nails',
+    featured: true,
+    active: true,
+    sortOrder: 3,
+  },
+  {
+    name: 'Manicure',
+    slug: 'manicure',
+    description: 'Professional manicure care in a welcoming salon environment.',
+    longDescription:
+      'Professional manicure care in a welcoming salon environment. Careful, detailed nail care that leaves your hands looking and feeling beautiful.',
+    price: '',
+    duration: '',
+    image: '',
+    category: 'Manicure',
+    featured: true,
+    active: true,
+    sortOrder: 4,
+  },
+  {
+    name: 'Threading',
+    slug: 'threading',
+    description: 'Professional threading services with careful attention to detail.',
+    longDescription:
+      'Professional threading services with careful attention to detail. Precise, gentle shaping carried out by a caring professional.',
+    price: '',
+    duration: '',
+    image: '',
+    category: 'Threading',
+    featured: true,
+    active: true,
+    sortOrder: 5,
+  },
+];
+
+const reviews = [
+  {
+    customerName: 'Avery',
+    rating: 5,
+    reviewText:
+      "I had such a lovely experience getting my lash lift! Miti was soo welcoming, friendly, and professional from start to finish. My lashes look lifted and natural, and I'm loving how they've turned out. I would highly recommend her to anyone …",
+    ownerResponse:
+      "Thank you so much! Your kind words really made my day. I'm so happy you love your lashes😊💕 …",
+    source: 'Google',
+    reviewDate: '2 months ago',
+    featured: true,
+    approved: true,
+  },
+  {
+    customerName: 'roghaye habibi',
+    rating: 5,
+    reviewText:
+      'I recently visited this salon, and I was genuinely impressed by the entire experience. The atmosphere is warm, welcoming, and very professional. She pays great attention to detail and truly listens to what her clients want. The quality of …',
+    ownerResponse: '',
+    source: 'Google',
+    reviewDate: '4 months ago',
+    featured: true,
+    approved: true,
+  },
+  {
+    customerName: 'Lara Gemei',
+    rating: 5,
+    reviewText:
+      'Got nail extensions done today! Absolutely amazing service and lovely sweet lady. I’m obsessed with my nails, thank you so much 💓💓 …',
+    ownerResponse:
+      '😍😍😍😍😍 Thanks for lovely comment😘 It’s so nice to see you, and I’m really happy you love your nails darling ... …',
+    source: 'Google',
+    reviewDate: '4 months ago',
+    featured: true,
+    approved: true,
+  },
+];
+
+// Gallery starts EMPTY on purpose: no stock photos are ever presented as the salon's work.
+// The owner uploads real photos from /admin/gallery.
+const gallery = [];
+
+function getInitialDb() {
+  const now = new Date().toISOString();
+  return {
+    settings: { ...settings, updatedAt: now },
+    services: services.map((s, i) => ({ ...s, _id: `service_seed_${i + 1}`, createdAt: now, updatedAt: now })),
+    reviews: reviews.map((r, i) => ({ ...r, _id: `review_seed_${i + 1}`, createdAt: now, updatedAt: now })),
+    gallery: [...gallery],
+    bookings: [],
+    messages: [],
+    admins: [],
+  };
+}
+
+module.exports = { settings, services, reviews, gallery, getInitialDb, WHATSAPP_NUMBER };
