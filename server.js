@@ -19,6 +19,13 @@ const galleryRoutes = require('./routes/galleryRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const customerAuthRoutes = require('./routes/customerAuthRoutes');
+const customerRoutes = require('./routes/customerRoutes');
+const adminAuthRoutes = require('./routes/adminAuthRoutes');
+const adminCustomerRoutes = require('./routes/adminCustomerRoutes');
+const adminAppointmentRoutes = require('./routes/adminAppointmentRoutes');
+const adminEnquiryRoutes = require('./routes/adminEnquiryRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5001;
@@ -78,7 +85,7 @@ app.head('/favicon.ico', (req, res) => res.status(204).end());
 // Health
 app.get('/api/health', (req, res) => res.json({ success: true, service: 'miti-beauty-api', time: new Date().toISOString() }));
 
-// Routes
+// Existing public routes
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/reviews', reviewRoutes);
@@ -86,6 +93,14 @@ app.use('/api/gallery', galleryRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/settings', settingsRoutes);
+
+// Customer account system
+app.use('/api/auth', customerAuthRoutes);
+app.use('/api/customer', customerRoutes);
+
+// Admin account system
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

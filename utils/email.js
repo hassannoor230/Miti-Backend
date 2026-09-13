@@ -1,5 +1,5 @@
 /**
- * SMTP email service.
+ * Transactional email service.
  *
  * Reads SMTP_* from .env. When SMTP_HOST is not set, email sending is a no-op
  * (the booking / enquiry is still stored — the site just doesn't notify by email).
@@ -26,14 +26,14 @@ function getTransporter() {
   return transporter;
 }
 
-async function sendMail({ to, subject, html, text }) {
+async function sendMail({ to, subject, html, text, bcc }) {
   const t = getTransporter();
   if (!t) {
     console.log('[email] SMTP not configured — skipping mail to', to);
     return false;
   }
   const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'Miti Beauty <noreply@mitibeauty.co.uk>';
-  await t.sendMail({ from, to, subject, html, text });
+  await t.sendMail({ from, to, subject, html, text, bcc });
   console.log('[email] Sent to', to, '—', subject);
   return true;
 }
