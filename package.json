@@ -5,6 +5,9 @@
   "type": "commonjs",
   "main": "server.js",
   "description": "Miti Beauty — Express + MongoDB REST API",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
